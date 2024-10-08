@@ -181,6 +181,7 @@
 
     //create and style inputs
     const start = document.createElement("input");
+    start.setAttribute("id", "start-date");
     start.setAttribute("type", "date");
     start.setAttribute("placeholder", "Start Date");
     // start.setAttribute("min", 0);
@@ -212,6 +213,8 @@
 
     end = start.cloneNode();
     end.setAttribute("placeholder", "End Date");
+    end.setAttribute("id", "end-date");
+
 
     start.addEventListener("change", buildValues);
     start.addEventListener("blur", buildValues);
@@ -220,7 +223,6 @@
     end.addEventListener("change", buildValues);
     end.addEventListener("blur", buildValues);
     end.addEventListener("keydown", keypress);
-
 
     container.appendChild(start);
     container.appendChild(end);
@@ -242,6 +244,7 @@
       },
       headerFilter: dateRangeFilterEditor,
       headerFilterFunc: dateRangeFilter,
+      // headerFilterParams: {start: "2024-01-01", end: "2024-12-31"}
       // headerFilterLiveFilter:false
     },
     {title: "Progress", field: "progress", editor:"input", headerFilter:true, width:150, formatter:"progress", sorter:"number", headerFilter:minMaxFilterEditor, headerFilterFunc:minMaxFilterFunction, headerFilterLiveFilter:false}
@@ -268,6 +271,11 @@
       //   {field: "endDate", type:"dateRange", value: {start: "2024-01-01", end: "2024-12-31"}}
       // ]
     });
+    table.on("tableBuilt", () => {
+        table.setHeaderFilterValue("endDate", {start: "2024-01-01", end: "2024-12-31"});
+        // table.refreshFilter();
+    });
+    // table.redraw();
   });
 
 </script>
