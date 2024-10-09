@@ -256,6 +256,7 @@
       "dateRange": dateRangeFilter
     });
     let table = new Tabulator("#example-table", {
+      // layout: "fitData",
       data: tableData,
       dataTree: true,
       dataTreeChildField: "children",
@@ -275,7 +276,7 @@
         const today = DateTime.now();
         const upcomingDateCutOff = today.plus({weeks: 6});
         console.log(upcomingDateCutOff);
-        if (data.status == "Closed") {
+        if (data.status === "Closed") {
           row.getElement().style.backgroundColor = "#9DC184";
         } else {
           if (data.endDate < today) {
