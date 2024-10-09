@@ -66,7 +66,8 @@
         children: item._links.children ? getChildren(item._links.children) : undefined,
         startDate: item.startDate ? formatDate(item.startDate) : formatDate(item.date),
         endDate: item.dueDate ? formatDate(item.dueDate) : formatDate(item.date),
-        progress: item.percentageDone
+        progress: item.percentageDone,
+        status: item._links.status.title
       }));
     }
 
@@ -80,7 +81,8 @@
       children: item._links.children ? getChildren(item._links.children) : undefined,
       startDate: item.startDate ? formatDate(item.startDate) : formatDate(item.date),
       endDate: item.dueDate ? formatDate(item.dueDate) : formatDate(item.date),
-      progress: item.percentageDone
+      progress: item.percentageDone,
+      status: item._links.status.title
     }))
 
   }
@@ -184,8 +186,6 @@
     start.setAttribute("id", "start-date");
     start.setAttribute("type", "date");
     start.setAttribute("placeholder", "Start Date");
-    // start.setAttribute("min", 0);
-    // start.setAttribute("max", 100);
     start.style.padding = "4px";
     start.style.width = "50%";
     start.style.boxSizing = "border-box";
@@ -202,8 +202,6 @@
     function keypress(e){
       if(e.keyCode === 13){
         buildValues();
-        // console.log(start.value);
-        // console.log(end.value);
       }
 
       if(e.keyCode === 27){
@@ -247,7 +245,8 @@
       // headerFilterParams: {start: "2024-01-01", end: "2024-12-31"}
       // headerFilterLiveFilter:false
     },
-    {title: "Progress", field: "progress", editor:"input", headerFilter:true, width:150, formatter:"progress", sorter:"number", headerFilter:minMaxFilterEditor, headerFilterFunc:minMaxFilterFunction, headerFilterLiveFilter:false}
+    {title: "Status", field: "status", editor: "input", headerFilter: true},
+    // {title: "Progress", field: "progress", editor:"input", headerFilter:true, width:150, formatter:"progress", sorter:"number", headerFilter:minMaxFilterEditor, headerFilterFunc:minMaxFilterFunction, headerFilterLiveFilter:false}
   ];
 
   getLiveData().then(data => {
@@ -267,13 +266,9 @@
         {column:"endDate", dir:"asc"},
         {column: "project", dir:"asc"},
       ],
-      // initialFilter:[
-      //   {field: "endDate", type:"dateRange", value: {start: "2024-01-01", end: "2024-12-31"}}
-      // ]
     });
     table.on("tableBuilt", () => {
         table.setHeaderFilterValue("endDate", {start: "2024-01-01", end: "2024-12-31"});
-        // table.refreshFilter();
     });
     // table.redraw();
   });
