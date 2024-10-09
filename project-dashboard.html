@@ -266,6 +266,9 @@
         {column:"endDate", dir:"asc"},
         {column: "project", dir:"asc"},
       ],
+      initialFilter:[
+        {field: "status", type:"!=", value: "Retired"}
+      ]
     });
     table.on("tableBuilt", () => {
         table.setHeaderFilterValue("endDate", {start: "2024-01-01", end: "2024-12-31"});
