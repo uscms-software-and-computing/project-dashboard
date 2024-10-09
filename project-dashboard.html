@@ -268,7 +268,25 @@
       ],
       initialFilter:[
         {field: "status", type:"!=", value: "Retired"}
-      ]
+      ],
+      rowFormatter: function (row) {
+        var data = row.getData();
+        // console.log(data.endDate)
+        const today = DateTime.now();
+        const upcomingDateCutOff = today.plus({weeks: 6});
+        console.log(upcomingDateCutOff);
+        if (data.status == "Closed") {
+          row.getElement().style.backgroundColor = "#9DC184";
+        } else {
+          if (data.endDate < today) {
+            row.getElement().style.backgroundColor = "#D26e69";
+          }
+          if (data.endDate > today && data.endDate < upcomingDateCutOff) {
+            row.getElement().style.backgroundColor = "#FADA76";
+          }
+        }
+
+      },
     });
     table.on("tableBuilt", () => {
         table.setHeaderFilterValue("endDate", {start: "2024-01-01", end: "2024-12-31"});
