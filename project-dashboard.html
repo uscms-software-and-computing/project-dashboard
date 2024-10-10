@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>Title</title>
-  <link href="https://unpkg.com/tabulator-tables@6.2.1/dist/css/tabulator.min.css" rel="stylesheet">
-  <script type="text/javascript" src="https://unpkg.com/tabulator-tables@6.2.1/dist/js/tabulator.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
+  <link href="css/tabulator.min.css" rel="stylesheet">
+  <script type="text/javascript" src="/js/tabulator.min.js"></script>
+  <script src="js/luxon.min.js"></script>
   <script type="text/javascript" src="js/jsonpath-0.8.0.js"></script>
 </head>
 <body>
@@ -22,7 +22,9 @@
     try {
       const response = await fetch(jsonUrl, { mode: 'cors'});
       if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
+        // throw new Error(`HTTP error! status: ${response.status}`);
+        console.error(`HTTP error! status: ${response.status}`);
+        return;
       }
       const jsonData = await response.json();
       return processData(jsonData);
@@ -32,7 +34,11 @@
       // Handle the error here, maybe show an error message to the user
     }
   }
+  /**
+   * @param {{_embedded:json}} data
+   */
   function processData(data) {
+
     const workPackages = data._embedded?.elements || []; // Use optional chaining
 
     const workActivities = jsonPath(data, "$._embedded.elements[?(@._links.type.title==\"Activity\")]");
@@ -55,9 +61,12 @@
         children.push(workPackageById[childId]);
       })
 
-      // console.log(workPackageById[45]);
-      // console.log(childrenList);
-      // console.log(children);
+      /**
+       * @param item
+       * @param item._links
+       * @param item.dueDate
+       * @param item.percentageDone
+       */
       return children.map(item => ({
         id: item.id,
         name: item.subject,
@@ -87,7 +96,7 @@
 
   }
 
-  const minMaxFilterEditor = function(cell, onRendered, success, cancel, editorParams){
+  const minMaxFilterEditor = function(cell, onRendered, success, cancel){
 
     let end;
 
@@ -97,8 +106,8 @@
     const start = document.createElement("input");
     start.setAttribute("type", "number");
     start.setAttribute("placeholder", "Min");
-    start.setAttribute("min", 0);
-    start.setAttribute("max", 100);
+    start.setAttribute("min", "0");
+    start.setAttribute("max", "100");
     start.style.padding = "4px";
     start.style.width = "50%";
     start.style.boxSizing = "border-box";
@@ -142,11 +151,9 @@
   }
 
   //custom max min filter function
-  function minMaxFilterFunction(headerValue, rowValue, rowData, filterParams){
+  function minMaxFilterFunction(headerValue, rowValue){
     //headerValue - the value of the header filter element
     //rowValue - the value of the column in this row
-    //rowData - the data for the row being filtered
-    //filterParams - params object passed to the headerFilterFuncParams property
 
     if(rowValue){
       if(headerValue.start !== ""){
@@ -175,7 +182,7 @@
   }
 
 
-  const dateRangeFilterEditor = function(cell, onRendered, success, cancel, editorParams){
+  const dateRangeFilterEditor = function(cell, onRendered, success, cancel){
 
     let end;
 
@@ -235,18 +242,16 @@
     {title: "Project", field: "project", editor:"input", headerFilter:true},
     // {title: "Start Date", field: "startDate", sorter: "date", editor:"input", headerFilter:true},
     {title: "End Date", field: "endDate", sorter: "date", editor:"input", width:150,
-      formatter: function(cell, formatterParams, onRendered){
+      formatter: function(cell){
         let value = cell.getValue();
         value = DateTime.fromISO(value).toFormat("LL/dd/yyyy");
         return value;
       },
       headerFilter: dateRangeFilterEditor,
       headerFilterFunc: dateRangeFilter,
-      // headerFilterParams: {start: "2024-01-01", end: "2024-12-31"}
-      // headerFilterLiveFilter:false
     },
     {title: "Status", field: "status", editor: "input", headerFilter: true},
-    // {title: "Progress", field: "progress", editor:"input", headerFilter:true, width:150, formatter:"progress", sorter:"number", headerFilter:minMaxFilterEditor, headerFilterFunc:minMaxFilterFunction, headerFilterLiveFilter:false}
+    {title: "Progress", field: "progress", editor:"input", visible:false, width:150, formatter:"progress", sorter:"number", headerFilter:minMaxFilterEditor, headerFilterFunc:minMaxFilterFunction, headerFilterLiveFilter:false}
   ];
 
   getLiveData().then(data => {
@@ -271,11 +276,9 @@
         {field: "status", type:"!=", value: "Retired"}
       ],
       rowFormatter: function (row) {
-        var data = row.getData();
-        // console.log(data.endDate)
+        const data = row.getData();
         const today = DateTime.now();
         const upcomingDateCutOff = today.plus({weeks: 6});
-        console.log(upcomingDateCutOff);
         if (data.status === "Closed") {
           row.getElement().style.backgroundColor = "#9DC184";
         } else {
