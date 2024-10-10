@@ -1,0 +1,1 @@
+export const jsonUrl = "https://uscms-software-and-computing.github.io/openproject-data/data/data.json";
