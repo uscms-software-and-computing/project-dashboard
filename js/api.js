@@ -2,6 +2,12 @@ import { jsonUrl } from './config.js';
 import {processData} from "./dataProcessor.js";
 import {displayErrorMessage} from "./ui.js";
 
+/**
+ * Fetches live data from the specified JSON URL and processes it.
+ * @async
+ * @function getLiveData
+ * @returns {Promise<Object|null>} The processed data or null if an error occurs.
+ */
 export async function getLiveData() {
     try {
         const response = await fetch(jsonUrl, { mode: 'cors' });

@@ -5,6 +5,10 @@ const DateTime = luxon.DateTime;
 const DATE_FORMAT = "LL/dd/yyyy";
 const ERROR_ELEMENT_ID = 'error-message';
 
+/**
+ * Displays an error message.
+ * @param {string} message - The error message to display.
+ */
 export function displayErrorMessage(message) {
     const errorElement = document.getElementById(ERROR_ELEMENT_ID);
     if (errorElement) {
@@ -13,6 +17,9 @@ export function displayErrorMessage(message) {
     }
 }
 
+/**
+ * Clears the error message.
+ */
 export function clearErrorMessage() {
     const errorElement = document.getElementById(ERROR_ELEMENT_ID);
     if (errorElement) {
@@ -36,6 +43,10 @@ const tableColumns = [
     {title: "Progress", field: "progress", editor:"input", visible:false, width:150, formatter:"progress", sorter:"number", headerFilter:minMaxFilterEditor, headerFilterFunc:minMaxFilterFunction, headerFilterLiveFilter:false}
 ];
 
+/**
+ * Formats the row based on the status and end date.
+ * @param {Object} row - The row to format.
+ */
 function rowFormatter(row) {
     const data = row.getData();
     const today = DateTime.now();
@@ -49,6 +60,10 @@ function rowFormatter(row) {
     }
 }
 
+/**
+ * Initializes the table with the given data.
+ * @param {Array} data - The data to populate the table.
+ */
 function initTable(data) {
     Tabulator.extendModule("filter", "filters", {
         "dateRange": dateRangeFilter,
