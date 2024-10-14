@@ -1,56 +1,74 @@
 const DateTime = luxon.DateTime;
 
-export function minMaxFilterEditor(cell, onRendered, success, cancel){
+function createInputElement(type, placeholder, value, buildValues, keypress) {
+    const input = document.createElement("input");
+    input.setAttribute("type", type);
+    input.setAttribute("placeholder", placeholder);
+    input.style.padding = "4px";
+    input.style.width = "50%";
+    input.style.boxSizing = "border-box";
+    input.value = value;
 
-    let end;
+    input.addEventListener("change", buildValues);
+    input.addEventListener("blur", buildValues);
+    input.addEventListener("keydown", keypress);
 
+    return input;
+}
+
+export function minMaxFilterEditor(cell, onRendered, success, cancel) {
     let container = document.createElement("span");
 
-    //create and style inputs
-    const start = document.createElement("input");
-    start.setAttribute("type", "number");
-    start.setAttribute("placeholder", "Min");
-    start.setAttribute("min", "0");
-    start.setAttribute("max", "100");
-    start.style.padding = "4px";
-    start.style.width = "50%";
-    start.style.boxSizing = "border-box";
-
-    start.value = cell.getValue();
-
-    function buildValues(){
+    function buildValues() {
         success({
-            start:start.value,
-            end:end.value,
+            start: start.value,
+            end: end.value,
         });
     }
 
-    function keypress(e){
-        if(e.keyCode === 13){
+    function keypress(e) {
+        if (e.keyCode === 13) {
             buildValues();
         }
-
-        if(e.keyCode === 27){
+        if (e.keyCode === 27) {
             cancel();
         }
     }
 
-    end = start.cloneNode();
-    end.setAttribute("placeholder", "Max");
-
-    start.addEventListener("change", buildValues);
-    start.addEventListener("blur", buildValues);
-    start.addEventListener("keydown", keypress);
-
-    end.addEventListener("change", buildValues);
-    end.addEventListener("blur", buildValues);
-    end.addEventListener("keydown", keypress);
-
+    const start = createInputElement("number", "Min", cell.getValue(), buildValues, keypress);
+    const end = createInputElement("number", "Max", "", buildValues, keypress);
 
     container.appendChild(start);
     container.appendChild(end);
 
-    // console.log(container);
+    return container;
+}
+
+export function dateRangeFilterEditor(cell, onRendered, success, cancel) {
+    let container = document.createElement("span");
+
+    function buildValues() {
+        success({
+            start: start.value,
+            end: end.value,
+        });
+    }
+
+    function keypress(e) {
+        if (e.keyCode === 13) {
+            buildValues();
+        }
+        if (e.keyCode === 27) {
+            cancel();
+        }
+    }
+
+    const start = createInputElement("date", "Start Date", cell.getValue(), buildValues, keypress);
+    const end = createInputElement("date", "End Date", "", buildValues, keypress);
+
+    container.appendChild(start);
+    container.appendChild(end);
+
     return container;
 }
 
@@ -83,59 +101,4 @@ export function dateRangeFilter(headerValue, rowValue) {
 
     const endDate = DateTime.fromISO(rowValue);
     return endDate >= start && endDate <= end;
-}
-
-
-export function dateRangeFilterEditor (cell, onRendered, success, cancel){
-
-    let end;
-
-    let container = document.createElement("span");
-
-    //create and style inputs
-    const start = document.createElement("input");
-    start.setAttribute("id", "start-date");
-    start.setAttribute("type", "date");
-    start.setAttribute("placeholder", "Start Date");
-    start.style.padding = "4px";
-    start.style.width = "50%";
-    start.style.boxSizing = "border-box";
-
-    start.value = cell.getValue();
-
-    function buildValues(){
-        success({
-            start: start.value,
-            end: end.value
-        });
-    }
-
-    function keypress(e){
-        if(e.keyCode === 13){
-            buildValues();
-        }
-
-        if(e.keyCode === 27){
-            cancel();
-        }
-    }
-
-    end = start.cloneNode();
-    end.setAttribute("placeholder", "End Date");
-    end.setAttribute("id", "end-date");
-
-
-    start.addEventListener("change", buildValues);
-    start.addEventListener("blur", buildValues);
-    start.addEventListener("keydown", keypress);
-
-    end.addEventListener("change", buildValues);
-    end.addEventListener("blur", buildValues);
-    end.addEventListener("keydown", keypress);
-
-    container.appendChild(start);
-    container.appendChild(end);
-
-    // console.log(container);
-    return container;
 }
