@@ -51,9 +51,18 @@ function rowFormatter(row) {
     const data = row.getData();
     const today = DateTime.now();
     const upcomingDateCutOff = today.plus({ weeks: 6 });
+
+    function checkChildStatus(data) {
+        if (data.children !== undefined) {
+            const childStatus = data.children.every(child => child.status !== "Closed");
+            return childStatus;
+        }
+        return true;
+    }
+
     if (data.status === "Closed") {
         row.getElement().style.backgroundColor = "#9DC184";
-    } else if (data.endDate < today) {
+    } else if (data.endDate < today && checkChildStatus(data)) {
         row.getElement().style.backgroundColor = "#D26e69";
     } else if (data.endDate > today && data.endDate < upcomingDateCutOff) {
         row.getElement().style.backgroundColor = "#FADA76";
