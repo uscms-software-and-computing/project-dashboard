@@ -43,17 +43,26 @@ export function processData(data) {
      * @returns {Object} The mapped item.
      */
     function itemMap(item) {
+        const parentHref = item._links?.parent?.href;
+        const childrenLinks = item._links.children;
+        const startDate = item.startDate || item.date;
+        const dueDate = item.dueDate || item.date;
+
+        const parentIdValue = parentId(parentHref);
+        const startDateFormatted = formatDate(startDate);
+        const endDateFormatted = formatDate(dueDate);
+
         return {
             id: item.id,
             name: item.subject,
             project: item._links.project.title,
-            parent: parentId(item._links?.parent?.href),
-            children: item._links.children ? getChildren(item._links.children) : undefined,
-            startDate: formatDate(item.startDate || item.date),
-            endDate: formatDate(item.dueDate || item.date),
+            parent: parentIdValue,
+            children: childrenLinks ? getChildren(childrenLinks) : undefined,
+            startDate: startDateFormatted,
+            endDate: endDateFormatted,
             progress: item.percentageDone,
             status: item._links.status.title,
-        }
+        };
     }
 
     /**
