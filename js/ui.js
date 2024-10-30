@@ -1,5 +1,6 @@
 import {dateRangeFilter, dateRangeFilterEditor, minMaxFilterEditor, minMaxFilterFunction} from "./filter.js";
 import {getLiveData} from "./api.js";
+
 const DateTime = luxon.DateTime;
 
 const DATE_FORMAT = "LL/dd/yyyy";
@@ -55,8 +56,7 @@ function rowFormatter(row) {
 
     function checkChildStatus(data) {
         if (data.children !== undefined) {
-            const childStatus = data.children.every(child => child.status !== "Closed");
-            return childStatus;
+            return data.children.every(child => child.status !== "Closed");
         }
         return true;
     }
@@ -95,6 +95,7 @@ function initTable(data) {
     const table = new Tabulator("#example-table", {
         data: data,
         dataTree: true,
+        // dataTreeStartExpanded: [true, false],
         dataTreeChildField: "children",
         dataTreeSort: false,
         columns: tableColumns,
