@@ -61,15 +61,20 @@ function rowFormatter(row) {
         return true;
     }
 
+    let backgroundColor = "";
+
     if (data.status === "Closed") {
-        row.getElement().style.backgroundColor = "#9DC184";
-        row.update({rowColor: "#9DC184"});
+        backgroundColor = "#9DC184";
     } else if (data.endDate < today && checkChildStatus(data)) {
-        row.getElement().style.backgroundColor = "#D26e69";
-        row.update({rowColor: "#D26e69"});
+        backgroundColor = "#D26e69";
     } else if (data.endDate > today && data.endDate < upcomingDateCutOff) {
-        row.getElement().style.backgroundColor = "#FADA76";
-        row.update({rowColor: "#FADA76"});
+        backgroundColor = "#FADA76";
+    }
+
+    // Perform DOM writes after all reads
+    if (backgroundColor) {
+        row.getElement().style.backgroundColor = backgroundColor;
+        row.update({ rowColor: backgroundColor });
     }
 }
 
