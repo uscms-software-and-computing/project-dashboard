@@ -85,6 +85,14 @@ export function minMaxFilterEditor(cell, onRendered, success, cancel) {
 export function dateRangeFilterEditor(cell, onRendered, success, cancel) {
     let container = document.createElement("span");
 
+    // Get the current date
+    const today = new Date();
+
+    // Create a new date object for the start of the year
+    const startOfYear = new Date(today.getFullYear(), 0, 1).toISOString().slice(0, 10);
+    const endOfYear = new Date(today.getFullYear(), 11, 31).toISOString().slice(0, 10);
+
+
     function buildValues() {
         success({
             start: start.value,
@@ -101,8 +109,8 @@ export function dateRangeFilterEditor(cell, onRendered, success, cancel) {
         }
     }
 
-    const start = createInputElement("date", "Start Date", cell.getValue(), buildValues, keypress);
-    const end = createInputElement("date", "End Date", "", buildValues, keypress);
+    const start = createInputElement("date", "Start Date", startOfYear, buildValues, keypress);
+    const end = createInputElement("date", "End Date", endOfYear, buildValues, keypress);
 
     container.appendChild(start);
     container.appendChild(end);
