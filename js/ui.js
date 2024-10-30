@@ -116,7 +116,8 @@ function initTable(data) {
     table.on("tableBuilt", () => {
         document.getElementById("download-html").addEventListener("click", function () {
             table.showColumn("rowColor");
-            table.download("htmlStyle", "data-style.html");
+            table.download("csv", "data-style.csv", { delimiter: "," });
+            table.hideColumn("rowColor");
             // const data = table.getHtml("active", true);
             // console.log(data);
         });
