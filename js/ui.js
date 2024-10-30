@@ -28,6 +28,14 @@ export function clearErrorMessage() {
     }
 }
 
+// Get the current date
+const today = new Date();
+
+// Create a new date objects for the start and end of the year
+// Set default values for the date range filter
+const startOfYear = new Date(today.getFullYear(), 0, 1).toISOString().slice(0, 10);
+const endOfYear = new Date(today.getFullYear(), 11, 31).toISOString().slice(0, 10);
+
 const tableColumns = [
     {title: "Name", field:"name", width:500},
     {title: "Project", field: "project", editor:"input", headerFilter:true},
@@ -39,6 +47,7 @@ const tableColumns = [
         },
         headerFilter: dateRangeFilterEditor,
         headerFilterFunc: dateRangeFilter,
+        headerFilterPlaceholder: { start: startOfYear, end: endOfYear },
     },
     {title: "Status", field: "status", editor: "input", headerFilter: true},
     {title: "Progress", field: "progress", editor:"input", visible:false, width:150, formatter:"progress", sorter:"number", headerFilter:minMaxFilterEditor, headerFilterFunc:minMaxFilterFunction, headerFilterLiveFilter:false},
