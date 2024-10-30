@@ -40,7 +40,8 @@ const tableColumns = [
         headerFilterFunc: dateRangeFilter,
     },
     {title: "Status", field: "status", editor: "input", headerFilter: true},
-    {title: "Progress", field: "progress", editor:"input", visible:false, width:150, formatter:"progress", sorter:"number", headerFilter:minMaxFilterEditor, headerFilterFunc:minMaxFilterFunction, headerFilterLiveFilter:false}
+    {title: "Progress", field: "progress", editor:"input", visible:false, width:150, formatter:"progress", sorter:"number", headerFilter:minMaxFilterEditor, headerFilterFunc:minMaxFilterFunction, headerFilterLiveFilter:false},
+    {title: "Row Color", field: "rowColor", visible:false},
 ];
 
 /**
@@ -62,10 +63,13 @@ function rowFormatter(row) {
 
     if (data.status === "Closed") {
         row.getElement().style.backgroundColor = "#9DC184";
+        row.update({rowColor: "#9DC184"});
     } else if (data.endDate < today && checkChildStatus(data)) {
         row.getElement().style.backgroundColor = "#D26e69";
+        row.update({rowColor: "#D26e69"});
     } else if (data.endDate > today && data.endDate < upcomingDateCutOff) {
         row.getElement().style.backgroundColor = "#FADA76";
+        row.update({rowColor: "#FADA76"});
     }
 }
 
@@ -78,6 +82,11 @@ function initTable(data) {
         "dateRange": dateRangeFilter,
     });
 
+    Tabulator.extendModule("download", "downloaders", {
+        htmlStyle: function(list, options, setFileContents) {
+            setFileContents(this.modules.export.getHtml("active", true), "text/html");
+        }
+    })
     const table = new Tabulator("#example-table", {
         data: data,
         dataTree: true,
@@ -97,6 +106,15 @@ function initTable(data) {
 
     table.on("tableBuilt", () => {
         table.setHeaderFilterValue("endDate", { start: "2024-01-01", end: "2024-12-31" });
+    });
+
+    table.on("tableBuilt", () => {
+        document.getElementById("download-html").addEventListener("click", function () {
+            table.showColumn("rowColor");
+            table.download("htmlStyle", "data-style.html");
+            // const data = table.getHtml("active", true);
+            // console.log(data);
+        });
     });
 }
 

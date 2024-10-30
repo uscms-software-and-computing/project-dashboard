@@ -62,6 +62,7 @@ export function processData(data) {
             endDate: endDateFormatted,
             progress: item.percentageDone,
             status: item._links.status.title,
+            rowColor: undefined
         };
     }
 
