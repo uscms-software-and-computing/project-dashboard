@@ -62,6 +62,7 @@ export function processData(data) {
             endDate: endDateFormatted,
             progress: item.percentageDone,
             status: item._links.status.title,
+            type: item._links.type.title,
             rowColor: undefined
         };
     }
@@ -79,6 +80,7 @@ export function processData(data) {
         }).map(itemMap);
     }
 
-
-    return workActivities.map(itemMap);
+    return workActivities
+        .map(itemMap)
+        .filter(item => item.children === undefined || item.children.every(child => child.type !== "Activity"));
 }
