@@ -137,15 +137,26 @@ export function minMaxFilterFunction(headerValue, rowValue) {
 /**
  * Custom filter function for date range filtering.
  * @param {Object} headerValue - The value of the header filter element.
- * @param {string} rowValue - The value of the column in this row.
+ * @param {string} headerValue.start - The start date of the filter range in ISO format.
+ * @param {string} headerValue.end - The end date of the filter range in ISO format.
+ * @param {string} rowValue - The value of the column in this row in ISO format.
+ * @param {Object} rowData - The data for the entire row.
+ * @param {Array<Object>} [rowData.children] - The children of the row, if any.
+ * @param {Object} [filterParams] - Additional parameters for the filter function.
  * @returns {boolean} True if the row value passes the filter, false otherwise.
  */
-export function dateRangeFilter(headerValue, rowValue) {
+export function dateRangeFilter(headerValue, rowValue, rowData, filterParams) {
     try {
         const start = DateTime.fromISO(headerValue.start);
         const end = DateTime.fromISO(headerValue.end);
         const endDate = DateTime.fromISO(rowValue);
-        return endDate >= start && endDate <= end;
+
+        const hasChildInRange = rowData.children?.some(child => {
+            const childEndDate = DateTime.fromISO(child.endDate);
+            return childEndDate >= start && childEndDate <= end;
+        });
+
+        return hasChildInRange || (endDate >= start && endDate <= end);
     } catch (error) {
         console.error("Invalid date format:", error);
         return false;
