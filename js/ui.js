@@ -28,6 +28,10 @@ export function clearErrorMessage() {
     }
 }
 
+function dateFormatter(cell, formatterParams, onRendered) {
+    return DateTime.fromISO(cell.getValue()).toFormat(DATE_FORMAT);
+}
+
 // Get the current date
 const today = new Date();
 
@@ -37,19 +41,24 @@ const startOfYear = new Date(today.getFullYear(), 0, 1).toISOString().slice(0, 1
 const endOfYear = new Date(today.getFullYear(), 11, 31).toISOString().slice(0, 10);
 
 const tableColumns = [
-    {title: "Name", field:"name", width:500},
-    {title: "Project", field: "project", editor:"input", headerFilter:true},
-    {title: "End Date", field: "endDate", sorter: "date", editor:"input", width:150,
-        formatter: function(cell){
-            let value = cell.getValue();
-            value = DateTime.fromISO(value).toFormat(DATE_FORMAT);
-            return value;
-        },
+    {title: ""},
+    {title: "ID", field: "id", visible: true},
+    // {title: "Name", field:"name", width:500},
+    {title: "Area", field: "project", editor:"input", headerFilter:true},
+    {title: "Description", field:"name", width:500},
+    {title: "Start Date", field: "startDate", sorter: "date", editor:"input", width:150, visible: false,
+        formatter: dateFormatter,
+        accessorDownload: dateFormatter
+    },
+    {title: "Finish Date", field: "endDate", sorter: "date", editor:"input", width:150,
+        formatter: dateFormatter,
         headerFilter: dateRangeFilterEditor,
         headerFilterFunc: dateRangeFilter,
         headerFilterPlaceholder: { start: startOfYear, end: endOfYear },
+        accessorDownload: dateFormatter
     },
     {title: "Status", field: "status", editor: "input", headerFilter: true},
+    {title: "Type", field: "type", editor: "input", headerFilter: true},
     {title: "Progress", field: "progress", editor:"input", visible:false, width:150, formatter:"progress", sorter:"number", headerFilter:minMaxFilterEditor, headerFilterFunc:minMaxFilterFunction, headerFilterLiveFilter:false},
     {title: "Row Color", field: "rowColor", visible:false},
 ];
@@ -104,7 +113,7 @@ function initTable(data) {
     const table = new Tabulator("#example-table", {
         data: data,
         dataTree: true,
-        // dataTreeStartExpanded: [true, false],
+        dataTreeStartExpanded: [true, false],
         dataTreeChildField: "children",
         dataTreeSort: false,
         columns: tableColumns,
@@ -126,8 +135,10 @@ function initTable(data) {
     table.on("tableBuilt", () => {
         document.getElementById("download-html").addEventListener("click", function () {
             table.showColumn("rowColor");
+            table.showColumn("startDate");
             table.download("csv", "data-style.csv", { delimiter: "," });
             table.hideColumn("rowColor");
+            table.hideColumn("startDate");
             // const data = table.getHtml("active", true);
             // console.log(data);
         });
