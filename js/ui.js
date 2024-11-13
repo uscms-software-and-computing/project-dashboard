@@ -29,7 +29,8 @@ export function clearErrorMessage() {
 }
 
 function dateFormatter(cell, formatterParams, onRendered) {
-    return DateTime.fromISO(cell.getValue()).toFormat(DATE_FORMAT);
+    let value = cell.getValue();
+    return DateTime.fromISO(value).toFormat(DATE_FORMAT);
 }
 
 // Get the current date
@@ -47,15 +48,31 @@ const tableColumns = [
     {title: "Area", field: "project", editor:"input", headerFilter:true},
     {title: "Description", field:"name", width:500},
     {title: "Start Date", field: "startDate", sorter: "date", editor:"input", width:150, visible: false,
-        formatter: dateFormatter,
-        accessorDownload: dateFormatter
+        formatter: function(cell){
+            let value = cell.getValue();
+            value = DateTime.fromISO(value).toFormat(DATE_FORMAT);
+            return value;
+        },
+        // accessorDownload: function(cell){
+        //     let value = cell.getValue();
+        //     value = DateTime.fromISO(value).toFormat(DATE_FORMAT);
+        //     return value;
+        // }
     },
     {title: "Finish Date", field: "endDate", sorter: "date", editor:"input", width:150,
-        formatter: dateFormatter,
+        formatter: function(cell){
+            let value = cell.getValue();
+            value = DateTime.fromISO(value).toFormat(DATE_FORMAT);
+            return value;
+        },
         headerFilter: dateRangeFilterEditor,
         headerFilterFunc: dateRangeFilter,
         headerFilterPlaceholder: { start: startOfYear, end: endOfYear },
-        accessorDownload: dateFormatter
+        // accessorDownload: function(cell){
+        //     let value = cell.getValue();
+        //     value = DateTime.fromISO(value).toFormat(DATE_FORMAT);
+        //     return value;
+        // }
     },
     {title: "Status", field: "status", editor: "input", headerFilter: true},
     {title: "Type", field: "type", editor: "input", headerFilter: true},
