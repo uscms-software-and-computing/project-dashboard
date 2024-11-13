@@ -1,34 +1,41 @@
-import { jsonUrl } from './config.js';
+import {scJsonUrl, wbs1JsonUrl, wbs2JsonUrl, wbs3JsonUrl, wbs4JsonUrl} from './config.js';
 import {processData} from "./dataProcessor.js";
 import {displayErrorMessage} from "./ui.js";
 
 /**
- * Fetches live data from the specified JSON URL and processes it.
+ * Fetches live data from multiple JSON URLs and processes it.
  * @async
  * @function getLiveData
- * @returns {Promise<Object|null>} The processed data or null if an error occurs.
+ * @returns {Promise<Array<Object>|null>} The combined processed data or null if an error occurs.
  */
 export async function getLiveData() {
     try {
-        const response = await fetch(jsonUrl, { mode: 'cors' });
+        const urls = [scJsonUrl, wbs1JsonUrl, wbs2JsonUrl, wbs3JsonUrl, wbs4JsonUrl];
+        const fetchPromises = urls.map(url => fetch(url, { mode: 'cors' }));
 
-        if (!response.ok) {
-            console.error(`HTTP error! status: ${response.status}`);
-            return;
-        }
+        const responses = await Promise.all(fetchPromises);
 
-        const jsonData = await response.json();
+        const jsonDataPromises = responses.map(response => {
+            if (!response.ok) {
+                console.error(`HTTP error! status: ${response.status}`);
+                return null;
+            }
+            return response.json();
+        });
 
-        // Validate the expected structure
-        /**
-        * @param {{_embedded:json}} data
-        */
-        if (!jsonData?._embedded?.elements) {
-            console.error("Unexpected data structure");
-            return;
-        }
+        const jsonDataArray = await Promise.all(jsonDataPromises);
 
-        return processData(jsonData);
+        // Validate the expected structure and process data
+        const processedDataArray = jsonDataArray.map(jsonData => {
+            if (!jsonData?._embedded?.elements) {
+                console.error("Unexpected data structure");
+                return [];
+            }
+            return processData(jsonData);
+        });
+
+        // Combine all processed data into a single array
+        return processedDataArray.flat();
     } catch (error) {
         console.error("Error fetching or processing data:", error);
         displayErrorMessage("Failed to load data. Please try again later.");
