@@ -41,7 +41,7 @@ const today = new Date();
 const startOfYear = new Date(today.getFullYear(), 0, 1).toISOString().slice(0, 10);
 const endOfYear = new Date(today.getFullYear(), 11, 31).toISOString().slice(0, 10);
 
-const tableColumns = [
+export const tableColumns = [
     {title: ""},
     {title: "ID", field: "id", visible: true},
     // {title: "Name", field:"name", width:500},
@@ -84,7 +84,7 @@ const tableColumns = [
  * Formats the row based on the status and end date.
  * @param {Object} row - The row to format.
  */
-function rowFormatter(row) {
+export function rowFormatter(row) {
     const data = row.getData();
     const today = DateTime.now();
     const upcomingDateCutOff = today.plus({ weeks: 6 });
@@ -112,65 +112,3 @@ function rowFormatter(row) {
         row.update({ rowColor: backgroundColor });
     }
 }
-
-/**
- * Initializes the table with the given data.
- * @param {Array} data - The data to populate the table.
- */
-function initTable(data) {
-    Tabulator.extendModule("filter", "filters", {
-        "dateRange": dateRangeFilter,
-    });
-
-    Tabulator.extendModule("download", "downloaders", {
-        htmlStyle: function(list, options, setFileContents) {
-            setFileContents(this.modules.export.getHtml("active", true), "text/html");
-        }
-    })
-    const table = new Tabulator("#example-table", {
-        data: data,
-        dataTree: true,
-        dataTreeStartExpanded: [true, false],
-        dataTreeChildField: "children",
-        dataTreeSort: false,
-        columns: tableColumns,
-        groupBy: ["project"],
-        initialSort: [
-            { column: "endDate", dir: "asc" },
-            { column: "project", dir: "asc" },
-        ],
-        initialFilter: [
-            { field: "status", type: "!=", value: "Retired" },
-        ],
-        rowFormatter: rowFormatter,
-    });
-
-    table.on("tableBuilt", () => {
-        table.setHeaderFilterValue("endDate", { start: "2024-01-01", end: "2024-12-31" });
-    });
-
-    table.on("tableBuilt", () => {
-        document.getElementById("download-html").addEventListener("click", function () {
-            table.showColumn("rowColor");
-            table.showColumn("startDate");
-            table.download("csv", "data-style.csv", { delimiter: "," });
-            table.hideColumn("rowColor");
-            table.hideColumn("startDate");
-            // const data = table.getHtml("active", true);
-            // console.log(data);
-        });
-    });
-}
-
-// Main execution
-getLiveData()
-    .then(data => {
-        if (data) {
-            clearErrorMessage();
-            initTable(data);
-        }
-    })
-    .catch(error => {
-        console.error("Error initializing the table:", error.message);
-        displayErrorMessage("Failed to load data for the table. Please try again later.");
-    });
