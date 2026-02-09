@@ -9,7 +9,8 @@ const DateTime = luxon.DateTime;
 export function processData(data) {
     const workPackages = data._embedded?.elements || [];
 
-    const workActivities = jsonPath(data, "$._embedded.elements[?(@._links.type.title==\"Activity\")]");
+    // const workActivities = jsonPath(data, "$._embedded.elements[?(@._links.type.title==\"Activity\")]");
+    const workActivities = jsonPath(data, "$._embedded.elements[?(@._links.type.title==\"Activity\" || @._links.type.title==\"Milestone\")]");
 
     const workPackageById = workPackages.reduce((map, item) => {
         map[item.id] = item;
