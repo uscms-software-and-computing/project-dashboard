@@ -1,4 +1,3 @@
-
 const DateTime = luxon.DateTime;
 
 /**
@@ -8,9 +7,6 @@ const DateTime = luxon.DateTime;
  */
 export function processData(data) {
     const workPackages = data._embedded?.elements || [];
-
-    // const workActivities = jsonPath(data, "$._embedded.elements[?(@._links.type.title==\"Activity\")]");
-    const workActivities = jsonPath(data, "$._embedded.elements[?(@._links.type.title==\"Activity\" || @._links.type.title==\"Milestone\")]");
 
     const workPackageById = workPackages.reduce((map, item) => {
         map[item.id] = item;
@@ -48,11 +44,9 @@ export function processData(data) {
         const childrenLinks = item._links.children;
         const startDate = item.startDate || item.date;
         const dueDate = item.dueDate || item.date;
-
         const parentIdValue = parentId(parentHref);
         const startDateFormatted = formatDate(startDate);
         const endDateFormatted = formatDate(dueDate);
-
         return {
             id: item.id,
             name: item.subject,
@@ -77,11 +71,35 @@ export function processData(data) {
         return childrenList.map(child => {
             const childId = Number(child?.href?.match(/.*\/(\d+)/)?.[1]);
             return workPackageById[childId] || {};
-
         }).map(itemMap);
     }
 
-    return workActivities
+    /**
+     * Determines whether a milestone should appear at the top level of the hierarchy.
+     * Area-level milestones (those whose parent is not an Activity or Task) are promoted
+     * to the top level, while child milestones remain nested under their parent.
+     * @param {Object} item - The raw work package item to evaluate.
+     * @returns {boolean} True if the milestone belongs at the top level, false otherwise.
+     */
+    const isTopLevelMilestone = (item) => {
+        if (item._links?.type?.title !== "Milestone") return false;
+        const pid = parentId(item._links?.parent);
+        if (!pid) return true; // no parent → area-level milestone
+        const parentItem = workPackageById[pid];
+        // Only promote if the parent is NOT an Activity or Task (i.e. it won't appear as a child already)
+        return !parentItem ||
+               (parentItem._links?.type?.title !== "Activity" &&
+                parentItem._links?.type?.title !== "Task");
+    };
+
+    // Fetch all Activities for the top level, then append any area-level milestones
+    // (those not already nested as children of an Activity or Task)
+    const workActivities = jsonPath(data, "$._embedded.elements[?(@._links.type.title==\"Activity\")]");
+
+    return [
+        ...workActivities,
+        ...workPackages.filter(isTopLevelMilestone)
+    ]
         .map(itemMap)
         .filter(item => item.children === undefined || item.children.every(child => child.type !== "Activity"));
 }
