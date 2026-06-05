@@ -1,7 +1,6 @@
 import {getLiveData} from "./api.js";
 import {dateRangeFilter} from "./filter.js";
 import {displayErrorMessage, clearErrorMessage, rowFormatter, tableColumns } from "./ui.js";
-
 /**
  * Initializes the table with the given data.
  * @param {Array} data - The data to populate the table.
@@ -10,7 +9,6 @@ function initTable(data) {
     Tabulator.extendModule("filter", "filters", {
         "dateRange": dateRangeFilter,
     });
-
     Tabulator.extendModule("download", "downloaders", {
         htmlStyle: function(list, options, setFileContents) {
             setFileContents(this.modules.export.getHtml("active", true), "text/html");
@@ -33,11 +31,14 @@ function initTable(data) {
         ],
         rowFormatter: rowFormatter,
     });
-
     table.on("tableBuilt", () => {
-        table.setHeaderFilterValue("endDate", { start: "2024-01-01", end: "2024-12-31" });
+        // Default the date-range filter to the start/end of the current year.
+        const DateTime = luxon.DateTime;
+        table.setHeaderFilterValue("endDate", {
+            start: DateTime.now().startOf("year").toISODate(),
+            end:   DateTime.now().endOf("year").toISODate(),
+        });
     });
-
     table.on("tableBuilt", () => {
         document.getElementById("download-html").addEventListener("click", function () {
             table.showColumn("rowColor");
@@ -50,7 +51,6 @@ function initTable(data) {
         });
     });
 }
-
 // Main execution
 getLiveData()
     .then(data => {

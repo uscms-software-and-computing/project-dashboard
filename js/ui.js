@@ -33,13 +33,11 @@ function dateFormatter(cell, formatterParams, onRendered) {
     return DateTime.fromISO(value).toFormat(DATE_FORMAT);
 }
 
-// Get the current date
-const today = new Date();
-
-// Create a new date objects for the start and end of the year
-// Set default values for the date range filter
-const startOfYear = new Date(today.getFullYear(), 0, 1).toISOString().slice(0, 10);
-const endOfYear = new Date(today.getFullYear(), 11, 31).toISOString().slice(0, 10);
+// Default values for the date range filter: start and end of the current year.
+// Uses Luxon (local-time) so it stays in sync with main.js and avoids the
+// UTC roll-back that new Date(...).toISOString() can introduce.
+const startOfYear = DateTime.now().startOf("year").toISODate();
+const endOfYear = DateTime.now().endOf("year").toISODate();
 
 export const tableColumns = [
     {title: ""},
