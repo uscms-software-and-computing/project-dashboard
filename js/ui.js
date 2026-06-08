@@ -51,11 +51,10 @@ export const tableColumns = [
             value = DateTime.fromISO(value).toFormat(DATE_FORMAT);
             return value;
         },
-        // accessorDownload: function(cell){
-        //     let value = cell.getValue();
-        //     value = DateTime.fromISO(value).toFormat(DATE_FORMAT);
-        //     return value;
-        // }
+        // Export a clean date instead of the raw ISO string (CSV/JSON).
+        accessorDownload: function (value) {
+            return value ? DateTime.fromISO(value).toFormat(DATE_FORMAT) : value;
+        },
     },
     {title: "Finish Date", field: "endDate", sorter: "date", editor:"input", width:150,
         formatter: function(cell){
@@ -66,11 +65,10 @@ export const tableColumns = [
         headerFilter: dateRangeFilterEditor,
         headerFilterFunc: dateRangeFilter,
         headerFilterPlaceholder: { start: startOfYear, end: endOfYear },
-        // accessorDownload: function(cell){
-        //     let value = cell.getValue();
-        //     value = DateTime.fromISO(value).toFormat(DATE_FORMAT);
-        //     return value;
-        // }
+        // Export a clean date instead of the raw ISO string (CSV/JSON).
+        accessorDownload: function (value) {
+            return value ? DateTime.fromISO(value).toFormat(DATE_FORMAT) : value;
+        },
     },
     {title: "Status", field: "status", editor: "input", headerFilter: true},
     {title: "Type", field: "type", editor: "input", headerFilter: true},
@@ -96,11 +94,15 @@ export function rowFormatter(row) {
 
     let backgroundColor = "";
 
+    // endDate is stored as an ISO string; parse it so the comparisons below
+    // are DateTime-vs-DateTime (string-vs-DateTime silently never matched).
+    const endDate = data.endDate ? DateTime.fromISO(data.endDate) : null;
+
     if (data.status === "Closed") {
         backgroundColor = "#9DC184";
-    } else if (data.endDate < today && checkChildStatus(data)) {
+    } else if (endDate && endDate.isValid && endDate < today && checkChildStatus(data)) {
         backgroundColor = "#D26e69";
-    } else if (data.endDate > today && data.endDate < upcomingDateCutOff) {
+    } else if (endDate && endDate.isValid && endDate > today && endDate < upcomingDateCutOff) {
         backgroundColor = "#FADA76";
     }
 

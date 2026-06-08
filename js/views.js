@@ -46,9 +46,36 @@ function applyState(table, presets, state) {
     }
 
     (state.headerFilters || []).forEach((f) => {
-        try { table.setHeaderFilterValue(f.field, f.value); }
-        catch (e) { console.warn("Header filter restore failed", f, e); }
+        try {
+            table.setHeaderFilterValue(f.field, f.value);
+            syncRangeInputs(table, f.field, f.value);
+        } catch (e) { console.warn("Header filter restore failed", f, e); }
     });
+}
+
+/**
+ * Pushes a restored {start, end} value into a custom range editor's input
+ * boxes. Tabulator can't do this for custom editors, so the visible inputs
+ * would otherwise keep their initial values even though the data re-filters.
+ * Assumes the column header holds its two range inputs in start, end order
+ * (true for both the date-range and min/max editors).
+ *
+ * @param {Object} table - The Tabulator instance.
+ * @param {string} field - The column field.
+ * @param {*} value - The restored header filter value.
+ */
+function syncRangeInputs(table, field, value) {
+    if (!value || typeof value !== "object" || !("start" in value && "end" in value)) return;
+    try {
+        const colEl = table.getColumn(field).getElement();
+        const inputs = colEl.querySelectorAll("input");
+        if (inputs.length >= 2) {
+            inputs[0].value = value.start == null ? "" : value.start;
+            inputs[1].value = value.end == null ? "" : value.end;
+        }
+    } catch (e) {
+        console.warn("Could not sync range inputs for", field, e);
+    }
 }
 
 function loadAll() {

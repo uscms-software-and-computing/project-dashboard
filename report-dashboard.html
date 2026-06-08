@@ -7,6 +7,12 @@
   <script type="text/javascript" src="js/tabulator.min.js" defer></script>
   <script type="text/javascript" src="js/luxon.min.js" defer></script>
   <script type="text/javascript" src="js/jsonpath-0.8.0.js" defer></script>
+  <!-- write-excel-file — required for styled Excel (.xlsx) export -->
+  <script type="text/javascript" src="js/write-excel-file.min.js" defer></script>
+  <!-- jsPDF + autotable — required for PDF export (load jsPDF before the plugin) -->
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" defer></script>
+  <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js" defer></script>
+  <!-- Excel (.xlsx) export uses write-excel-file, loaded on demand by xlsxStyled.js -->
   <script type="module" src="js/report-generator.js"></script>
 </head>
 <body>

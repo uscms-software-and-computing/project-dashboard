@@ -1,3 +1,5 @@
+import { downloadStyledXlsx } from "./xlsxStyled.js";
+
 const DateTime = luxon.DateTime;
 
 // Hidden columns worth including in exports (revealed during download, then re-hidden).
@@ -12,7 +14,7 @@ const FORMATS = [
 
 /**
  * Runs the actual download, temporarily revealing hidden-but-useful columns.
- * Columns flagged `download: false` (e.g. the timeline) are excluded automatically.
+ * Columns flagged `download: false` are excluded automatically.
  *
  * @param {Object} table - The Tabulator instance.
  * @param {string} fmt - One of "csv" | "xlsx" | "pdf" | "json".
@@ -34,11 +36,8 @@ function doExport(table, fmt) {
                 table.download("json", `${base}.json`);
                 break;
             case "xlsx":
-                if (!window.XLSX) {
-                    alert("Excel export needs the SheetJS (XLSX) library. See the wiring notes.");
-                    break;
-                }
-                table.download("xlsx", `${base}.xlsx`, { sheetName: "Dashboard" });
+                // Styled export via write-excel-file (handles its own download).
+                downloadStyledXlsx(table, `${base}.xlsx`);
                 break;
             case "pdf":
                 if (!(window.jspdf || window.jsPDF)) {

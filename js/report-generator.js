@@ -1,16 +1,13 @@
 import {getLiveData} from "./api.js";
 import {dateRangeFilter} from "./filter.js";
 import {displayErrorMessage, clearErrorMessage, rowFormatter, tableColumns } from "./ui.js";
-import {timelineColumn, setTimelineWindow} from "./timeline.js";   // NEW
-import {initControls} from "./dashboardControls.js";               // NEW
+import {initControls} from "./dashboardControls.js";
 
 /**
  * Initializes the table with the given data.
  * @param {Array} data - The data to populate the table.
  */
 function initTable(data) {
-    setTimelineWindow(data); // NEW: compute the timeline window before first render
-
     Tabulator.extendModule("filter", "filters", {
         "dateRange": dateRangeFilter,
     });
@@ -25,7 +22,7 @@ function initTable(data) {
         dataTreeStartExpanded: [true, false],
         dataTreeChildField: "children",
         dataTreeSort: false,
-        columns: [...tableColumns, timelineColumn], // NEW: append the timeline column
+        columns: tableColumns,
         groupBy: ["project"],
         initialSort: [
             { column: "endDate", dir: "asc" },

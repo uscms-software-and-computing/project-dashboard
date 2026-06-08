@@ -1,4 +1,3 @@
-import { initPresets } from "./presets.js";
 import { initExporter } from "./exporter.js";
 import { initViews } from "./views.js";
 
@@ -34,11 +33,6 @@ const CSS = `
     font-size: 13px;
 }
 .dc-btn:hover { background: #eef1f5; }
-.dc-btn.is-active {
-    background: #2f6fb0;
-    border-color: #2f6fb0;
-    color: #fff;
-}
 .dc-select {
     padding: 5px 8px;
     border: 1px solid #cfd4dc;
@@ -46,30 +40,6 @@ const CSS = `
     background: #fff;
     font-size: 13px;
     max-width: 180px;
-}
-
-/* Inline timeline column */
-.tl-track {
-    position: relative;
-    height: 14px;
-    background: #eef1f4;
-    border-radius: 3px;
-    overflow: hidden;
-}
-.tl-bar {
-    position: absolute;
-    top: 2px;
-    height: 10px;
-    border-radius: 3px;
-    min-width: 2px;
-}
-.tl-today {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    background: #c0392b;
-    opacity: .5;
 }
 `;
 
@@ -106,7 +76,6 @@ function ensureToolbar() {
 export function initControls(table) {
     injectCSS();
     const bar = ensureToolbar();
-    const presets = initPresets(table, bar);
     initExporter(table, bar);
-    initViews(table, bar, presets);
+    initViews(table, bar);
 }
