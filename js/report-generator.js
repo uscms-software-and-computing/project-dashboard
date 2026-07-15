@@ -1,62 +1,16 @@
-import {getLiveData} from "./api.js";
-import {dateRangeFilter} from "./filter.js";
-import {displayErrorMessage, clearErrorMessage, rowFormatter, tableColumns } from "./ui.js";
-/**
- * Initializes the table with the given data.
- * @param {Array} data - The data to populate the table.
- */
-function initTable(data) {
-    Tabulator.extendModule("filter", "filters", {
-        "dateRange": dateRangeFilter,
-    });
-    Tabulator.extendModule("download", "downloaders", {
-        htmlStyle: function(list, options, setFileContents) {
-            setFileContents(this.modules.export.getHtml("active", true), "text/html");
-        }
-    })
-    const table = new Tabulator("#example-table", {
-        data: data,
-        dataTree: true,
-        dataTreeStartExpanded: [true, false],
-        dataTreeChildField: "children",
-        dataTreeSort: false,
-        columns: tableColumns,
-        groupBy: ["project"],
-        initialSort: [
-            { column: "endDate", dir: "asc" },
-            { column: "project", dir: "asc" },
-        ],
-        initialFilter: [
-            { field: "status", type: "!=", value: "Retired" },
-        ],
-        rowFormatter: rowFormatter,
-    });
-    table.on("tableBuilt", () => {
-        // Default the date-range filter to the start/end of the current year.
-        const DateTime = luxon.DateTime;
-        table.setHeaderFilterValue("endDate", {
-            start: DateTime.now().startOf("year").toISODate(),
-            end:   DateTime.now().endOf("year").toISODate(),
-        });
-    });
-    table.on("tableBuilt", () => {
-        document.getElementById("download-html").addEventListener("click", function () {
-            table.showColumn("rowColor");
-            table.showColumn("startDate");
-            table.download("csv", "data-style.csv", { delimiter: "," });
-            table.hideColumn("rowColor");
-            table.hideColumn("startDate");
-            // const data = table.getHtml("active", true);
-            // console.log(data);
-        });
-    });
-}
+import { getLiveData } from "./api.js";
+import { displayErrorMessage, clearErrorMessage } from "./ui.js";
+import { initTable } from "./table.js";
+
 // Main execution
 getLiveData()
     .then(data => {
         if (data) {
             clearErrorMessage();
-            initTable(data);
+            initTable(data, {
+                dataTreeStartExpanded: [true, false],
+                extraColumnsOnDownload: ["startDate"],
+            });
         }
     })
     .catch(error => {

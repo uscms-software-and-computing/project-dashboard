@@ -1,6 +1,4 @@
 const DateTime = luxon.DateTime;
-const ENTER_KEY_CODE = 13;
-const ESC_KEY_CODE = 27;
 
 
 /**
@@ -47,7 +45,7 @@ function createInputElement(type, placeholder, value, buildValues, keypress) {
  * @returns {HTMLElement} The container element with min and max input fields.
  */
 export function minMaxFilterEditor(cell, onRendered, success, cancel) {
-    let container = document.createElement("span");
+    const container = document.createElement("span");
 
     function buildValues() {
         success({
@@ -57,10 +55,10 @@ export function minMaxFilterEditor(cell, onRendered, success, cancel) {
     }
 
     function keypress(e) {
-        if (e.keyCode === ENTER_KEY_CODE) {
+        if (e.key === "Enter") {
             buildValues();
         }
-        if (e.keyCode === ESC_KEY_CODE) {
+        if (e.key === "Escape") {
             cancel();
         }
     }
@@ -83,15 +81,10 @@ export function minMaxFilterEditor(cell, onRendered, success, cancel) {
  * @returns {HTMLElement} The container element with start and end date input fields.
  */
 export function dateRangeFilterEditor(cell, onRendered, success, cancel) {
-    let container = document.createElement("span");
+    const container = document.createElement("span");
 
-    // Get the current date
-    const today = new Date();
-
-    // Create a new date object for the start of the year
-    const startOfYear = new Date(today.getFullYear(), 0, 1).toISOString().slice(0, 10);
-    const endOfYear = new Date(today.getFullYear(), 11, 31).toISOString().slice(0, 10);
-
+    const startOfYear = DateTime.now().startOf("year").toISODate();
+    const endOfYear = DateTime.now().endOf("year").toISODate();
 
     function buildValues() {
         success({
@@ -101,10 +94,10 @@ export function dateRangeFilterEditor(cell, onRendered, success, cancel) {
     }
 
     function keypress(e) {
-        if (e.keyCode === ENTER_KEY_CODE) {
+        if (e.key === "Enter") {
             buildValues();
         }
-        if (e.keyCode === ESC_KEY_CODE) {
+        if (e.key === "Escape") {
             cancel();
         }
     }
@@ -150,10 +143,10 @@ export function minMaxFilterFunction(headerValue, rowValue) {
  * @param {string} rowValue - The value of the column in this row in ISO format.
  * @param {Object} rowData - The data for the entire row.
  * @param {Array<Object>} [rowData.children] - The children of the row, if any.
- * @param {Object} [filterParams] - Additional parameters for the filter function.
+ * @param {Object} [_filterParams] - Additional parameters for the filter function (unused).
  * @returns {boolean} True if the row value passes the filter, false otherwise.
  */
-export function dateRangeFilter(headerValue, rowValue, rowData, filterParams) {
+export function dateRangeFilter(headerValue, rowValue, rowData, _filterParams) {
     try {
         const start = DateTime.fromISO(headerValue.start);
         const end = DateTime.fromISO(headerValue.end);

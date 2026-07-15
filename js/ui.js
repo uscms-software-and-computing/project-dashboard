@@ -1,5 +1,4 @@
 import {dateRangeFilter, dateRangeFilterEditor, minMaxFilterEditor, minMaxFilterFunction} from "./filter.js";
-import {getLiveData} from "./api.js";
 
 const DateTime = luxon.DateTime;
 
@@ -28,11 +27,6 @@ export function clearErrorMessage() {
     }
 }
 
-function dateFormatter(cell, formatterParams, onRendered) {
-    let value = cell.getValue();
-    return DateTime.fromISO(value).toFormat(DATE_FORMAT);
-}
-
 // Default values for the date range filter: start and end of the current year.
 // Uses Luxon (local-time) so it stays in sync with main.js and avoids the
 // UTC roll-back that new Date(...).toISOString() can introduce.
@@ -42,7 +36,6 @@ const endOfYear = DateTime.now().endOf("year").toISODate();
 export const tableColumns = [
     {title: ""},
     {title: "ID", field: "id", visible: true},
-    // {title: "Name", field:"name", width:500},
     {title: "Area", field: "project", editor:"input", headerFilter:true},
     {title: "Description", field:"name", width:500},
     {title: "Start Date", field: "startDate", sorter: "date", editor:"input", width:150, visible: false,
@@ -51,11 +44,6 @@ export const tableColumns = [
             value = DateTime.fromISO(value).toFormat(DATE_FORMAT);
             return value;
         },
-        // accessorDownload: function(cell){
-        //     let value = cell.getValue();
-        //     value = DateTime.fromISO(value).toFormat(DATE_FORMAT);
-        //     return value;
-        // }
     },
     {title: "Finish Date", field: "endDate", sorter: "date", editor:"input", width:150,
         formatter: function(cell){
@@ -66,11 +54,6 @@ export const tableColumns = [
         headerFilter: dateRangeFilterEditor,
         headerFilterFunc: dateRangeFilter,
         headerFilterPlaceholder: { start: startOfYear, end: endOfYear },
-        // accessorDownload: function(cell){
-        //     let value = cell.getValue();
-        //     value = DateTime.fromISO(value).toFormat(DATE_FORMAT);
-        //     return value;
-        // }
     },
     {title: "Status", field: "status", editor: "input", headerFilter: true},
     {title: "Type", field: "type", editor: "input", headerFilter: true},
@@ -94,13 +77,16 @@ export function rowFormatter(row) {
         return true;
     }
 
+    const endDate = DateTime.fromISO(data.endDate);
+    if (!endDate.isValid) return;
+
     let backgroundColor = "";
 
     if (data.status === "Closed") {
         backgroundColor = "#9DC184";
-    } else if (data.endDate < today && checkChildStatus(data)) {
+    } else if (endDate.toMillis() < today.toMillis() && checkChildStatus(data)) {
         backgroundColor = "#D26e69";
-    } else if (data.endDate > today && data.endDate < upcomingDateCutOff) {
+    } else if (endDate.toMillis() > today.toMillis() && endDate.toMillis() < upcomingDateCutOff.toMillis()) {
         backgroundColor = "#FADA76";
     }
 
