@@ -1,0 +1,24 @@
+{
+  "name": "project-dashboard",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "USCMS Software & Computing project dashboard",
+  "scripts": {
+    "lint": "eslint js/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/uscms-software-and-computing/project-dashboard.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/uscms-software-and-computing/project-dashboard/issues"
+  },
+  "homepage": "https://github.com/uscms-software-and-computing/project-dashboard#readme",
+  "devDependencies": {
+    "eslint": "^10.7.0",
+    "globals": "^17.7.0"
+  }
+}
